@@ -20,9 +20,15 @@ export async function login(_: ActionState, fd: FormData): Promise<ActionState> 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error) {
-    if (error.message.toLowerCase().includes('not confirmed'))
-      return { error: 'E-mail ešte nie je overený. Skontrolujte schránku a kliknite na overovací odkaz.' }
-    return { error: GENERIC_LOGIN_ERROR }
+    console.error('login failed:', error.status, error.code, error.message)
+    const m = error.message.toLowerCase()
+    if (m.includes('not confirmed'))
+      return { error: 'E-mail ešte nie je overený. V Supabase zapnite „Auto Confirm User“ alebo vypnite Confirm email.' }
+    if (m.includes('invalid login credentials')) return { error: GENERIC_LOGIN_ERROR }
+    if (m.includes('banned')) return { error: 'Účet je zablokovaný.' }
+    if (m.includes('api key') || m.includes('jwt')) return { error: 'Zlý Supabase kľúč alebo URL v .env.local.' }
+    if (m.includes('disabled')) return { error: 'Prihlasovanie e-mailom je v Supabase vypnuté (Authentication → Sign In / Providers → Email).' }
+    return { error: `Prihlásenie zlyhalo (${error.message.slice(0, 120)}).` }
   }
   redirect(safeNext(fd.get('next')))
 }
@@ -61,15 +67,24 @@ export async function signUp(_: ActionState, fd: FormData): Promise<ActionState>
     return { error: 'Registrácia dobrovoľníka je možná iba cez pozvánku organizácie.' }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data: created, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: { data, emailRedirectTo: `${siteUrl()}/auth/callback?next=${encodeURIComponent(next)}` },
   })
   if (error) {
-    if (/password|weak|pwned/i.test(error.message)) return { error: 'Heslo je príliš slabé alebo uniknuté. Zvoľte iné.' }
-    return { error: 'Registráciu sa nepodarilo dokončiť. Skúste to znova.' }
+    console.error('signUp failed:', error.status, error.message)
+    const m = error.message
+    if (/password|weak|pwned/i.test(m)) return { error: 'Heslo je príliš slabé alebo uniknuté. Zvoľte iné.' }
+    if (/already registered|already been registered/i.test(m)) return { error: 'Účet s týmto e-mailom už existuje. Prihláste sa.' }
+    if (/database error/i.test(m)) return { error: 'Chyba databázy: pravdepodobne nie sú spustené SQL migrácie v Supabase (všetky 4 súbory v poradí).' }
+    if (/rate limit/i.test(m)) return { error: 'Supabase dočasne obmedzil počet registrácií. Skúste o chvíľu.' }
+    if (/signups not allowed|disabled/i.test(m)) return { error: 'Registrácie sú v Supabase vypnuté (Authentication → Sign In / Providers → povoľte „Allow new users to sign up“).' }
+    if (/invalid api key|jwt|apikey/i.test(m)) return { error: 'Zlý Supabase kľúč. Skontrolujte NEXT_PUBLIC_SUPABASE_URL a NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.' }
+    return { error: `Registráciu sa nepodarilo dokončiť (${m.slice(0, 120)}).` }
   }
+  // pri vypnutom overovaní e-mailu je používateľ hneď prihlásený
+  if (created.session) redirect(next)
   redirect('/verify-email')
 }
 
