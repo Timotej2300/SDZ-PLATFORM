@@ -26,6 +26,7 @@ export function DecisionForm({
   return (
     <form action={formAction} className="space-y-2">
       <input type="hidden" name={hiddenName} value={id} />
+      <input type="hidden" name="decision" defaultValue="" />
       {anyReason && (
         <input name="reason" placeholder={reasonLabel} aria-label={reasonLabel} maxLength={1000} className="input" />
       )}
@@ -34,12 +35,12 @@ export function DecisionForm({
           <button
             key={c.value}
             type="submit"
-            name="decision"
-            value={c.value}
             disabled={pending}
             className={`btn-${c.variant}`}
             onClick={(e) => {
               const form = e.currentTarget.form
+              const dec = form?.elements.namedItem('decision') as HTMLInputElement | null
+              if (dec) dec.value = c.value
               const reason = form?.elements.namedItem('reason') as HTMLInputElement | null
               if (c.needsReason && reason && reason.value.trim().length < 3) {
                 e.preventDefault()
