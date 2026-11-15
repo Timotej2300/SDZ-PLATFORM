@@ -1,6 +1,6 @@
-# SDZ – Slovenský dobrovoľnícky zväz (FÁZY 1–3)
+# SDZ – Slovenský dobrovoľnícky zväz (FÁZY 1–5)
 
-Next.js (App Router) + Supabase + Vercel. Stav: FÁZA 1 (základy), 2 (organizácie), 3 (dobrovoľníci) hotové.
+Next.js (App Router) + Supabase + Vercel. Stav: FÁZA 1 (základy), 2 (organizácie), 3 (dobrovoľníci), 4 (podujatia, formuláre, prihlášky), 5 (dochádzka, hodiny, certifikáty) hotové.
 
 ## Nastavenie
 1. Supabase projekt (región EÚ). Spusti migrácie z `supabase/migrations/` v poradí (SQL Editor alebo `supabase db push`).
@@ -10,4 +10,13 @@ Next.js (App Router) + Supabase + Vercel. Stav: FÁZA 1 (základy), 2 (organizá
 5. `npm install && npm run dev`. Vercel: pridať env premenné vrátane `CRON_SECRET`.
 
 ## Testy
-`supabase/tests/00_stub.sql` + migrácie + `01_rules.sql` na lokálnom PostgreSQL (pravidlá Foundera, členstvo, prestup, licencie, RLS).
+`supabase/tests/00_stub.sql` + migrácie + `01_rules.sql` + `02_events.sql` (podujatia, prihlášky, súhlas domovskej organizácie, dochádzka, licencia počas podujatia, certifikáty) na lokálnom PostgreSQL (pravidlá Foundera, členstvo, prestup, licencie, RLS).
+
+
+## Fázy 4 a 5 – čo pribudlo
+- Migrácie `20261114000005_events.sql` a `20261114000006_attendance.sql`: spusti ich v SQL Editore Supabase **po** prvých štyroch, v tomto poradí.
+- Organizácia: Podujatia, Prihlášky (aj súhlas domovskej organizácie), Pracovné tímy, Pozície, Pracovné zmeny, Dynamické formuláre (verzované), Dochádzka a certifikáty.
+- Dobrovoľník: verejné `/podujatia` (prihlásenie), účet → Prihlášky, Podujatia, Odpracované hodiny, Certifikáty, História.
+- Admin: `/admin/events` (iba čítanie).
+- Pravidlá: prihlásiť sa dá iba s platnou licenciou; na cudzie podujatie musí súhlasiť domovská organizácia; licencia, ktorá vyprší počas už začatého podujatia, umožní dochádzku dokončiť (zapíše sa do auditu), ale nie nové prihlásenie ani nové zaradenie; dochádzka je iba manuálna (bez QR) a každá oprava vyžaduje dôvod.
+- Nové oprávnenia (Founder ich môže meniť): `events.manage`, `forms.manage`, `applications.decide`, `events.consent`, `attendance.write`, `certificates.issue`, systémové `events.read`.

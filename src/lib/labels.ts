@@ -61,7 +61,41 @@ export const SCOPE_LABELS: Record<string, string> = {
   event: 'Podujatie',
 }
 
+export const EVENT_STATUS_LABELS: Record<string, string> = {
+  draft: 'Rozpracované',
+  published: 'Zverejnené',
+  cancelled: 'Zrušené',
+}
+
+export const APP_STATUS_LABELS: Record<string, string> = {
+  draft: 'Rozpracovaná',
+  submitted: 'Odoslaná',
+  in_review: 'V kontrole',
+  needs_info: 'Čaká na doplnenie',
+  approved: 'Schválená – čaká na zaradenie',
+  assigned: 'Zaradený',
+  rejected: 'Zamietnutá',
+  cancelled: 'Zrušená',
+}
+
+export const CONSENT_LABELS: Record<string, string> = {
+  not_required: 'Nie je potrebný',
+  pending: 'Čaká na domovskú organizáciu',
+  granted: 'Udelený',
+  denied: 'Zamietnutý',
+}
+
+export const FIELD_TYPE_LABELS: Record<string, string> = {
+  text: 'Krátky text',
+  textarea: 'Dlhý text',
+  number: 'Číslo',
+  select: 'Výber',
+  checkbox: 'Zaškrtávacie pole',
+  date: 'Dátum',
+}
+
+const TZ = 'Europe/Bratislava'
 export const fmtDate = (v: string | null | undefined) =>
-  v ? new Date(v).toLocaleDateString('sk-SK') : '—'
+  v ? new Date(v).toLocaleDateString('sk-SK', { timeZone: TZ }) : '—'
 export const fmtDateTime = (v: string | null | undefined) =>
-  v ? new Date(v).toLocaleString('sk-SK', { dateStyle: 'short', timeStyle: 'short' }) : '—'
+  v ? new Date(v).toLocaleString('sk-SK', { dateStyle: 'short', timeStyle: 'short', timeZone: TZ }) : '—'

@@ -24,15 +24,35 @@ const MESSAGES: Record<string, string> = {
   LICENSE_BLOCKED: 'Licenciu nie je možné obnoviť (je pozastavená alebo zrušená).',
   RENEW_TOO_EARLY: 'Licenciu je možné obnoviť najskôr 90 dní pred expiráciou.',
   IMMUTABLE: 'Tento údaj sa nedá meniť.',
+  EVENT_CLOSED: 'Podujatie nie je otvorené (je zrušené, skončené, nezverejnené alebo organizácia nie je aktívna).',
+  DEADLINE_PASSED: 'Termín prihlasovania na podujatie už uplynul.',
+  AGE_NOT_ALLOWED: 'Podľa roku narodenia nespĺňate vekovú podmienku podujatia.',
+  ALREADY_APPLIED: 'Na toto podujatie už máte prihlášku.',
+  FORM_INCOMPLETE: 'Vyplňte všetky povinné polia formulára.',
+  FORM_INVALID: 'Formulár obsahuje neplatné údaje.',
+  FORM_LOCKED: 'Formulár podujatia sa nedá zmeniť, kým existujú prihlášky.',
+  CONSENT_REQUIRED: 'Najprv musí súhlasiť domovská organizácia dobrovoľníka.',
+  CAPACITY_FULL: 'Kapacita je naplnená.',
+  VOLUNTEER_INACTIVE: 'Dobrovoľnícky účet nie je aktívny.',
+  NOT_ASSIGNED: 'Dobrovoľník nie je zaradený na túto pracovnú zmenu.',
+  ATTENDANCE_EXISTS: 'Dochádzka na túto zmenu už existuje. Použite opravu.',
+  INVALID_TIME: 'Neplatný čas (budúcnosť, mimo zmeny alebo dlhšie ako 24 hodín).',
+  EVENT_NOT_ENDED: 'Certifikát je možné vystaviť až po skončení podujatia.',
+  NO_HOURS: 'Dobrovoľník nemá na podujatí žiadne odpracované hodiny.',
+  ATTENDANCE_OPEN: 'Niektorý záznam dochádzky nemá zapísaný odchod.',
+  IN_USE: 'Položka sa už používa a nedá sa zmazať.',
+  HAS_APPLICATIONS: 'Podujatie už má prihlášky, preto sa táto akcia nedá vykonať.',
 }
 
 export function dbMessage(error: { message?: string } | null | undefined): string {
   const msg = error?.message ?? ''
-  for (const key of Object.keys(MESSAGES)) {
+  // dlhšie kľúče majú prednosť (INVALID_STATE pred INVALID)
+  for (const key of Object.keys(MESSAGES).sort((a, b) => b.length - a.length)) {
     if (msg.includes(key)) return MESSAGES[key]
   }
   if (msg.includes('row-level security') || msg.includes('permission denied')) return MESSAGES.FORBIDDEN
   if (msg.includes('duplicate key')) return MESSAGES.DUPLICATE
+  if (msg.includes('violates foreign key')) return MESSAGES.IN_USE
   if (msg.includes('violates check constraint')) return MESSAGES.INVALID
   return 'Operáciu sa nepodarilo vykonať. Skúste to znova.'
 }

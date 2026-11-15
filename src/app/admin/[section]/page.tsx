@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import { Pending } from '@/components/ui'
 
 const SECTIONS: Record<string, [string, string]> = {
-  events: ['Podujatia', 'FÁZA 4 – Podujatia'],
   complaints: ['Sťažnosti', 'FÁZA 7 – Dohľad a bezpečnosť'],
   moderation: ['Moderácia', 'FÁZA 7 – Dohľad a bezpečnosť'],
   awards: ['Ocenenia', 'FÁZA 8 – Rozšírenie (pravidlá ocenení zatiaľ nie sú definované)'],

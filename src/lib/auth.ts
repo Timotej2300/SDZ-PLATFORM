@@ -108,3 +108,13 @@ export async function getCurrentOrg(): Promise<{ ctx: Ctx; org: OrgCtx | null }>
   const org = ctx.orgs.find((o) => o.id === wanted) ?? ctx.orgs[0] ?? null
   return { ctx, org }
 }
+
+/** Stránky organizačného portálu: vyžadujú aktuálnu organizáciu a jedno z oprávnení. */
+export async function requireOrgPermission(...keys: string[]): Promise<OrgCtx> {
+  const { org } = await getCurrentOrg()
+  if (!org) redirect('/register/organization')
+  for (const k of keys) {
+    if (await hasOrgPermission(k, org.id)) return org
+  }
+  redirect('/organization')
+}

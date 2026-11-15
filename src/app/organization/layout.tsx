@@ -16,28 +16,34 @@ export default async function OrgLayout({ children }: { children: React.ReactNod
     )
   }
 
-  const [manage, staff, docs, vols, invite, transfers] = await Promise.all([
+  const [manage, staff, docs, vols, invite, transfers, evManage, appDecide, evConsent, formsManage, attWrite, certIssue] = await Promise.all([
     hasOrgPermission('org.manage', org.id),
     hasOrgPermission('org.staff.manage', org.id),
     hasOrgPermission('org.documents', org.id),
     hasOrgPermission('volunteers.read', org.id),
     hasOrgPermission('volunteers.invite', org.id),
     hasOrgPermission('transfers.decide', org.id),
+    hasOrgPermission('events.manage', org.id),
+    hasOrgPermission('applications.decide', org.id),
+    hasOrgPermission('events.consent', org.id),
+    hasOrgPermission('forms.manage', org.id),
+    hasOrgPermission('attendance.write', org.id),
+    hasOrgPermission('certificates.issue', org.id),
   ])
   const nav: NavItem[] = [{ href: '/organization', label: 'Prehľad' }]
   if (manage) nav.push({ href: '/organization/profile', label: 'Profil organizácie' })
   if (vols) nav.push({ href: '/organization/members', label: 'Členovia' }, { href: '/organization/volunteers', label: 'Dobrovoľníci' })
   if (invite) nav.push({ href: '/organization/registrations', label: 'Žiadosti o registráciu' })
   if (transfers) nav.push({ href: '/organization/transfers', label: 'Prestupy a hosťovania' })
-  nav.push(
-    { href: '/organization/events', label: 'Podujatia' },
-    { href: '/organization/applications', label: 'Prihlášky' },
+  if (evManage) nav.push({ href: '/organization/events', label: 'Podujatia' })
+  if (appDecide || evConsent) nav.push({ href: '/organization/applications', label: 'Prihlášky' })
+  if (evManage) nav.push(
     { href: '/organization/teams', label: 'Pracovné tímy' },
     { href: '/organization/positions', label: 'Pozície' },
     { href: '/organization/shifts', label: 'Pracovné zmeny' },
-    { href: '/organization/attendance', label: 'Dochádzka' },
-    { href: '/organization/forms', label: 'Dynamické formuláre' },
   )
+  if (attWrite || certIssue) nav.push({ href: '/organization/attendance', label: 'Dochádzka' })
+  if (formsManage) nav.push({ href: '/organization/forms', label: 'Dynamické formuláre' })
   if (docs) nav.push({ href: '/organization/documents', label: 'Dokumenty' })
   nav.push({ href: '/organization/notifications', label: 'Oznámenia' }, { href: '/organization/analytics', label: 'Štatistiky' })
   if (staff) nav.push({ href: '/organization/staff', label: 'Zamestnanci a pracovníci' })
