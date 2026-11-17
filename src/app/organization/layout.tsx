@@ -16,7 +16,7 @@ export default async function OrgLayout({ children }: { children: React.ReactNod
     )
   }
 
-  const [manage, staff, docs, vols, invite, transfers, evManage, appDecide, evConsent, formsManage, attWrite, certIssue] = await Promise.all([
+  const [manage, staff, docs, vols, invite, transfers, evManage, appDecide, evConsent, formsManage, attWrite, certIssue, analytics, respond] = await Promise.all([
     hasOrgPermission('org.manage', org.id),
     hasOrgPermission('org.staff.manage', org.id),
     hasOrgPermission('org.documents', org.id),
@@ -29,6 +29,8 @@ export default async function OrgLayout({ children }: { children: React.ReactNod
     hasOrgPermission('forms.manage', org.id),
     hasOrgPermission('attendance.write', org.id),
     hasOrgPermission('certificates.issue', org.id),
+    hasOrgPermission('analytics.view', org.id),
+    hasOrgPermission('complaints.respond', org.id),
   ])
   const nav: NavItem[] = [{ href: '/organization', label: 'Prehľad' }]
   if (manage) nav.push({ href: '/organization/profile', label: 'Profil organizácie' })
@@ -45,7 +47,9 @@ export default async function OrgLayout({ children }: { children: React.ReactNod
   if (attWrite || certIssue) nav.push({ href: '/organization/attendance', label: 'Dochádzka' })
   if (formsManage) nav.push({ href: '/organization/forms', label: 'Dynamické formuláre' })
   if (docs) nav.push({ href: '/organization/documents', label: 'Dokumenty' })
-  nav.push({ href: '/organization/notifications', label: 'Oznámenia' }, { href: '/organization/analytics', label: 'Štatistiky' })
+  nav.push({ href: '/organization/notifications', label: 'Oznámenia' })
+  if (analytics) nav.push({ href: '/organization/analytics', label: 'Štatistiky' })
+  if (respond) nav.push({ href: '/organization/complaints', label: 'Sťažnosti' })
   if (staff) nav.push({ href: '/organization/staff', label: 'Zamestnanci a pracovníci' })
   nav.push({ href: '/organization/settings', label: 'Nastavenia' }, { href: '/account', label: '← Môj účet' })
 

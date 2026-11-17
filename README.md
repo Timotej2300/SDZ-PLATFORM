@@ -20,3 +20,13 @@ Next.js (App Router) + Supabase + Vercel. Stav: FÁZA 1 (základy), 2 (organizá
 - Admin: `/admin/events` (iba čítanie).
 - Pravidlá: prihlásiť sa dá iba s platnou licenciou; na cudzie podujatie musí súhlasiť domovská organizácia; licencia, ktorá vyprší počas už začatého podujatia, umožní dochádzku dokončiť (zapíše sa do auditu), ale nie nové prihlásenie ani nové zaradenie; dochádzka je iba manuálna (bez QR) a každá oprava vyžaduje dôvod.
 - Nové oprávnenia (Founder ich môže meniť): `events.manage`, `forms.manage`, `applications.decide`, `events.consent`, `attendance.write`, `certificates.issue`, systémové `events.read`.
+
+
+## Fáza 6 a 7 (oznámenia, štatistiky, sťažnosti, pozastavenie, GDPR)
+Migrácie spustite v Supabase SQL Editore v poradí po 06:
+1. `20261114000007_notifications.sql`
+2. `20261114000008_oversight.sql`
+
+Nové env premenné (Vercel): `RESEND_API_KEY`, `EMAIL_FROM` (voliteľné; bez nich e-maily zostanú vo fronte). Cron `/api/cron/daily` teraz aj odosiela e-maily a uplatňuje plánované pozastavenia.
+Testy (iba lokálne, nie v Supabase): `supabase/tests/03_oversight.sql`.
+Bezpečnosť, GDPR a pilot: `docs/PILOT_A_BEZPECNOST.md`.

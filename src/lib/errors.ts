@@ -40,6 +40,9 @@ const MESSAGES: Record<string, string> = {
   EVENT_NOT_ENDED: 'Certifikát je možné vystaviť až po skončení podujatia.',
   NO_HOURS: 'Dobrovoľník nemá na podujatí žiadne odpracované hodiny.',
   ATTENDANCE_OPEN: 'Niektorý záznam dochádzky nemá zapísaný odchod.',
+  RATE_LIMIT: 'Dosiahli ste denný limit podaní. Skúste to zajtra.',
+  ALREADY_EXISTS: 'Takýto záznam alebo žiadosť už existuje.',
+  INVALID_INPUT: 'Skontrolujte vyplnené údaje (povinné polia, minimálna dĺžka textu).',
   IN_USE: 'Položka sa už používa a nedá sa zmazať.',
   HAS_APPLICATIONS: 'Podujatie už má prihlášky, preto sa táto akcia nedá vykonať.',
 }

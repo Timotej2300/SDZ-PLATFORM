@@ -17,6 +17,8 @@ export default async function AccountLayout({ children }: { children: React.Reac
     { href: '/account/certificates', label: 'Certifikáty' },
     { href: '/account/history', label: 'História činnosti' },
     { href: '/account/notifications', label: 'Oznámenia' },
+    { href: '/account/complaints', label: 'Sťažnosti' },
+    { href: '/account/privacy', label: 'Ochrana údajov' },
     { href: '/account/settings', label: 'Nastavenia' },
   ]
   if (ctx.orgs.length > 0) nav.push({ href: '/organization', label: 'Organizačný portál' })

@@ -99,3 +99,29 @@ export const fmtDate = (v: string | null | undefined) =>
   v ? new Date(v).toLocaleDateString('sk-SK', { timeZone: TZ }) : '—'
 export const fmtDateTime = (v: string | null | undefined) =>
   v ? new Date(v).toLocaleString('sk-SK', { dateStyle: 'short', timeStyle: 'short', timeZone: TZ }) : '—'
+
+export const COMPLAINT_STATUS_LABELS: Record<string, string> = {
+  new: 'Nová', in_review: 'V riešení', needs_info: 'Čaká na doplnenie',
+  resolved: 'Vyriešená', rejected: 'Zamietnutá', withdrawn: 'Stiahnutá',
+}
+export const COMPLAINT_TARGET_LABELS: Record<string, string> = {
+  organization: 'Organizácia', event: 'Podujatie', volunteer: 'Dobrovoľník', sdz: 'SDZ (centrála)', other: 'Iné',
+}
+export const SUSPENSION_STATUS_LABELS: Record<string, string> = {
+  scheduled: 'Naplánované', active: 'Aktívne', lifted: 'Zrušené', expired: 'Skončené',
+}
+export const DATA_KIND_LABELS: Record<string, string> = {
+  access: 'Prístup k údajom', rectification: 'Oprava údajov', erasure: 'Vymazanie údajov',
+  restriction: 'Obmedzenie spracúvania', objection: 'Námietka proti spracúvaniu',
+}
+
+export const NOTIFICATION_GROUPS: [string, string][] = [
+  ['application', 'Prihlášky na podujatia'],
+  ['event', 'Podujatia a pripomienky'],
+  ['license', 'SDZ licencia'],
+  ['transfer', 'Prestupy'],
+  ['certificate', 'Certifikáty'],
+  ['complaint', 'Sťažnosti'],
+  ['announcement', 'Oznamy SDZ'],
+]
+
