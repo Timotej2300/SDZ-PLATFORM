@@ -30,3 +30,6 @@ Migrácie spustite v Supabase SQL Editore v poradí po 06:
 Nové env premenné (Vercel): `RESEND_API_KEY`, `EMAIL_FROM` (voliteľné; bez nich e-maily zostanú vo fronte). Cron `/api/cron/daily` teraz aj odosiela e-maily a uplatňuje plánované pozastavenia.
 Testy (iba lokálne, nie v Supabase): `supabase/tests/03_oversight.sql`.
 Bezpečnosť, GDPR a pilot: `docs/PILOT_A_BEZPECNOST.md`.
+
+## Fáza 8 (regionálna administrácia, SDZ Awards)
+Migrácia: `20261114000009_regional_awards.sql` (po 08). Regionálneho manažéra menuje centrála v `/admin/regions`; vidí iba svoj región (`/regional`). Ocenenia sa udeľujú ručne v `/admin/awards`; bodovanie, prahy a automatika zámerne nie sú definované. Test: `supabase/tests/04_regional.sql` (iba lokálne).

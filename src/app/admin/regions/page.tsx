@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { hasPermission, requireCentral } from '@/lib/auth'
 import { ActionForm } from '@/components/ActionForm'
 import { Field, PageHeader, Select, Table, Td } from '@/components/ui'
-import { addDistrict, addRegion } from '@/actions/admin'
+import { addDistrict, addRegion, appointRegionalManager, revokeRegionalManager } from '@/actions/admin'
 
 export const metadata = { title: 'Regióny' }
 
@@ -15,6 +15,8 @@ export default async function Page() {
     supabase.from('districts').select('id,region_id,name').order('name'),
     supabase.from('organizations').select('region_id').eq('status', 'approved'),
   ])
+  const { data: mgrs } = await supabase.rpc('regional_managers')
+  const managers = (mgrs ?? []) as { id: string; region_id: string; name: string; email: string }[]
   const dist = (districts ?? []) as { id: string; region_id: string; name: string }[]
   const rs = (regions ?? []) as { id: string; code: string; name: string }[]
   const orgCount = new Map<string, number>()
@@ -22,7 +24,7 @@ export default async function Page() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Regióny" intro="Regióny a okresy spravuje SDZ centrálne. Menovanie regionálnych manažérov a regionálna administrácia pribudnú vo fáze rozšírenia." />
+      <PageHeader title="Regióny" intro="Regióny a okresy spravuje SDZ centrálne. Regionálny manažér vidí iba pridelený región." />
       {canManage && (
         <div className="grid gap-4 md:grid-cols-2">
           <section className="card">
@@ -51,6 +53,23 @@ export default async function Page() {
           </tr>
         ))}
       </Table>
+      <section className="space-y-3">
+        <h2 className="font-semibold">Regionálni manažéri</h2>
+        {canManage && (
+          <section className="card">
+            <ActionForm action={appointRegionalManager} submit="Vymenovať" resetOnSuccess confirm="Vymenovať regionálneho manažéra?">
+              <Select label="Región" name="region" required placeholder="Vyberte región" options={rs.map((r) => ({ value: r.id, label: r.name }))} />
+              <Field label="E-mail používateľa (musí mať účet)" name="email" type="email" required />
+            </ActionForm>
+          </section>
+        )}
+        <Table head={['Región', 'Manažér', 'E-mail', '']}>
+          {managers.map((m) => (
+            <tr key={m.id}><Td>{rs.find((r) => r.id === m.region_id)?.name}</Td><Td>{m.name}</Td><Td>{m.email}</Td>
+              <Td>{canManage && <ActionForm action={revokeRegionalManager} submit="Odvolať" variant="danger" confirm="Odvolať regionálneho manažéra?"><input type="hidden" name="id" value={m.id} /></ActionForm>}</Td></tr>
+          ))}
+        </Table>
+      </section>
     </div>
   )
 }

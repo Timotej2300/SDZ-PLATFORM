@@ -1,5 +1,6 @@
 import { AppShell, type NavItem } from '@/components/shell'
 import { getContext, requireUser } from '@/lib/auth'
+import { myRegions } from '@/lib/regional'
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireUser()
@@ -15,12 +16,14 @@ export default async function AccountLayout({ children }: { children: React.Reac
     { href: '/account/calendar', label: 'Kalendár' },
     { href: '/account/hours', label: 'Odpracované hodiny' },
     { href: '/account/certificates', label: 'Certifikáty' },
+    { href: '/account/awards', label: 'Ocenenia' },
     { href: '/account/history', label: 'História činnosti' },
     { href: '/account/notifications', label: 'Oznámenia' },
     { href: '/account/complaints', label: 'Sťažnosti' },
     { href: '/account/privacy', label: 'Ochrana údajov' },
     { href: '/account/settings', label: 'Nastavenia' },
   ]
+  if ((await myRegions()).length > 0) nav.push({ href: '/regional', label: 'Regionálna administrácia' })
   if (ctx.orgs.length > 0) nav.push({ href: '/organization', label: 'Organizačný portál' })
   if (ctx.is_founder) nav.push({ href: '/founder', label: 'Founder Control Center' })
   if (ctx.is_founder || ctx.system_roles.length > 0) nav.push({ href: '/admin', label: 'Administrácia SDZ' })

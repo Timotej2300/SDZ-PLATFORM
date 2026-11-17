@@ -4,11 +4,11 @@ import { hasPermission, requireCentral, requireUser } from '@/lib/auth'
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireUser()
   await requireCentral('/admin')
-  const [orgs, review, vols, lic, tr, users, audit, regions, settings, complaints, announce, gdpr, analytics] = await Promise.all([
+  const [orgs, review, vols, lic, tr, users, audit, regions, settings, complaints, announce, gdpr, analytics, awards] = await Promise.all([
     hasPermission('orgs.read'), hasPermission('orgs.review'), hasPermission('volunteers.read.all'),
     hasPermission('licenses.manage'), hasPermission('transfers.review'), hasPermission('users.read'),
     hasPermission('audit.read'), hasPermission('regions.manage'), hasPermission('settings.write'),
-    hasPermission('complaints.read'), hasPermission('announcements.manage'), hasPermission('gdpr.manage'), hasPermission('analytics.read'),
+    hasPermission('complaints.read'), hasPermission('announcements.manage'), hasPermission('gdpr.manage'), hasPermission('analytics.read'), hasPermission('awards.manage'),
   ])
   const nav: NavItem[] = [{ href: '/admin', label: 'Prehľad' }]
   if (users) nav.push({ href: '/admin/users', label: 'Používatelia' })
@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (orgs) nav.push({ href: '/admin/moderation', label: 'Moderácia' })
   if (announce) nav.push({ href: '/admin/announcements', label: 'Oznamy' })
   if (gdpr) nav.push({ href: '/admin/gdpr', label: 'Ochrana údajov' })
-  nav.push({ href: '/admin/awards', label: 'Ocenenia' })
+  if (awards) nav.push({ href: '/admin/awards', label: 'Ocenenia' })
   if (audit) nav.push({ href: '/admin/audit-logs', label: 'Auditné záznamy' })
   if (analytics) nav.push({ href: '/admin/analytics', label: 'Štatistiky' })
   if (settings) nav.push({ href: '/admin/settings', label: 'Centrálne nastavenia' })

@@ -76,3 +76,72 @@ export async function addDistrict(_: ActionState, fd: FormData): Promise<ActionS
   revalidatePath('/admin/regions')
   return { ok: 'Okres bol pridaný.' }
 }
+
+export async function appointRegionalManager(_: ActionState, fd: FormData): Promise<ActionState> {
+  const region = uuidSchema.safeParse(fd.get('region'))
+  const email = String(fd.get('email') ?? '').trim()
+  if (!region.success || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: 'Vyberte región a zadajte e-mail.' }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('appoint_regional_manager', { p_email: email, p_region: region.data })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/admin/regions')
+  return { ok: 'Regionálny manažér bol vymenovaný.' }
+}
+
+export async function revokeRegionalManager(_: ActionState, fd: FormData): Promise<ActionState> {
+  const id = uuidSchema.safeParse(fd.get('id'))
+  if (!id.success) return { error: 'Neplatná požiadavka.' }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('revoke_regional_manager', { p_user_role_id: id.data })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/admin/regions')
+  return { ok: 'Menovanie bolo zrušené.' }
+}
+
+export async function saveAwardType(_: ActionState, fd: FormData): Promise<ActionState> {
+  const idRaw = String(fd.get('id') ?? '')
+  const id = idRaw ? uuidSchema.safeParse(idRaw) : null
+  if (id && !id.success) return { error: 'Neplatná požiadavka.' }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('save_award_type', {
+    p_id: id?.data ?? null, p_name: String(fd.get('name') ?? '').trim(),
+    p_description: String(fd.get('description') ?? '').trim(), p_active: fd.get('active') !== 'off',
+  })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/admin/awards')
+  return { ok: 'Druh ocenenia bol uložený.' }
+}
+
+export async function grantAward(_: ActionState, fd: FormData): Promise<ActionState> {
+  const vol = String(fd.get('reg') ?? '').trim()
+  const type = uuidSchema.safeParse(fd.get('type'))
+  if (!type.success || !vol) return { error: 'Zadajte registračné číslo a vyberte ocenenie.' }
+  const supabase = await createClient()
+  const { data: v } = await supabase.from('volunteers').select('id').eq('registration_number', vol).maybeSingle()
+  if (!v) return { error: 'Dobrovoľník s týmto registračným číslom neexistuje.' }
+  const { error } = await supabase.rpc('grant_award', { p_volunteer: v.id, p_type: type.data, p_note: String(fd.get('note') ?? '').trim() || null })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/admin/awards')
+  return { ok: 'Ocenenie bolo udelené.' }
+}
+
+export async function revokeAward(_: ActionState, fd: FormData): Promise<ActionState> {
+  const id = uuidSchema.safeParse(fd.get('id'))
+  if (!id.success) return { error: 'Neplatná požiadavka.' }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('revoke_award', { p_id: id.data, p_reason: String(fd.get('reason') ?? '').trim() })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/admin/awards')
+  return { ok: 'Ocenenie bolo odobraté.' }
+}
+
+export async function switchRegion(fd: FormData) {
+  const id = uuidSchema.safeParse(fd.get('region'))
+  if (!id.success) return
+  const { cookies } = await import('next/headers')
+  const supabase = await createClient()
+  const { data } = await supabase.rpc('my_regions')
+  if (!((data ?? []) as { id: string }[]).some((r) => r.id === id.data)) return
+  ;(await cookies()).set('sdz_region', id.data, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 60 * 60 * 24 * 90 })
+  revalidatePath('/regional', 'layout')
+}

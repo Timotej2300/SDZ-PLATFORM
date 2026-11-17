@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation'
 import { Pending } from '@/components/ui'
 
 const SECTIONS: Record<string, [string, string]> = {
-  modules: ['Správa modulov', 'FÁZA 8 – Rozšírenie (vypínanie modulov zatiaľ nie je definované)'],
-  branding: ['Vizuálna identita', 'FÁZA 8 – Rozšírenie'],
+  modules: ['Správa modulov', 'Čaká na rozhodnutie (pravidlá vypínania modulov zatiaľ nie sú definované)'],
+  branding: ['Vizuálna identita', 'Čaká na rozhodnutie'],
 }
 
 export default async function Page({ params }: { params: Promise<{ section: string }> }) {
