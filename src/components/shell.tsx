@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { signOut } from '@/actions/auth'
+import { getBranding } from '@/lib/branding'
 
-export function Logo({ light = false }: { light?: boolean }) {
+export async function Logo({ light = false }: { light?: boolean }) {
+  const b = await getBranding()
   return (
     <Link href="/" className={`flex items-center gap-2 font-bold ${light ? 'text-white' : 'text-navy-900'}`}>
-      <span className="grid h-8 w-8 place-items-center rounded bg-green-600 text-sm text-white">SDZ</span>
-      <span className="hidden sm:inline">Slovenský dobrovoľnícky zväz</span>
+      <span className="grid h-8 w-8 place-items-center rounded bg-green-600 text-sm text-white">{b.short}</span>
+      <span className="hidden sm:inline">{b.name}</span>
     </Link>
   )
 }
@@ -59,13 +61,14 @@ export function PublicHeader({ signedIn }: { signedIn: boolean }) {
   )
 }
 
-export function PublicFooter() {
+export async function PublicFooter() {
+  const b = await getBranding()
   return (
     <footer className="mt-16 bg-navy-900 text-sm text-gray-300">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:grid-cols-3">
         <div>
           <Logo light />
-          <p className="mt-3 text-gray-300">SDZ – Jedno miesto pre všetkých, ktorí chcú pomáhať.</p>
+          <p className="mt-3 text-gray-300">{b.tagline}</p>
         </div>
         <div className="flex flex-col gap-2">
           <Link href="/pravidla" className="hover:text-white">Pravidlá SDZ</Link>

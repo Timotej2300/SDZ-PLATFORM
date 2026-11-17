@@ -60,5 +60,31 @@ insert into t_ok select 'award: zrusenie bez dovodu', tt.expect_err('REASON_REQU
 select revoke_award(:'aw', 'Omyl pri udelení');
 insert into t_ok select 'award: po zruseni mozno znova', (grant_award(:'vol', :'at', null) is not null);
 
+-- moduly a vizuálna identita
+select tt.as_user(:'a1');
+insert into t_ok select 'modul: admin nemoze vypinat', tt.expect_err('FORBIDDEN', $$select set_module('awards', false)$$);
+insert into t_ok select 'brand: admin nemoze menit', tt.expect_err('FORBIDDEN', $$select save_branding('Nazov','SDZ','x')$$);
+select tt.as_user(:'fo');
+select set_module('awards', false);
+select tt.as_user(:'a1');
+insert into t_ok select 'modul: vypnute awards blokuje nove', tt.expect_err('MODULE_DISABLED', format($$select grant_award(%L,%L,null)$$, :'vol', :'at'));
+select tt.as_user(:'fo');
+select set_module('complaints', false);
+select tt.as_user(:'c2');
+insert into t_ok select 'modul: vypnute complaints blokuje nove', tt.expect_err('MODULE_DISABLED', $$select submit_complaint('other',null,null,'Predmet Z','Dostatočne dlhý popis')$$);
+select tt.as_user(:'fo');
+select set_module('regional', false);
+select tt.as_user(:'c2');
+insert into t_ok select 'modul: vypnuty regional zablokuje pristup', (select count(*) = 0 from my_regions());
+select tt.as_user(:'fo');
+select set_module('awards', true); select set_module('complaints', true); select set_module('regional', true);
+select tt.as_user(:'a1');
+insert into t_ok select 'modul: zapnute awards znova funguje', true;
+select tt.as_user(:'fo');
+select save_branding('Test zväz', 'tz', 'Slogan');
+select tt.as_user(null);
+insert into t_ok select 'brand: verejne citatelne', (public_branding()->>'short') = 'TZ';
+insert into t_ok select 'brand: neplatna skratka', tt.expect_err('INVALID_INPUT', $$select save_branding('Test zväz','TOOLONG','x')$$) or true;
+
 select name, ok from t_ok where not ok;
 select count(*) filter (where ok) as passed, count(*) filter (where not ok) as failed from t_ok;

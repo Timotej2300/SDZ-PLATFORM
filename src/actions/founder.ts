@@ -103,3 +103,31 @@ export async function runMaintenance(): Promise<ActionState> {
     ok: `Hotovo: licencie blížiace sa k expirácii ${r.licenses_expiring}, expirované ${r.licenses_expired}, prestupy po lehote ${r.transfers_overdue}, ukončené hosťovania ${r.guestings_ended}.`,
   }
 }
+
+export async function setModule(_: ActionState, fd: FormData): Promise<ActionState> {
+  const g = await founderGuard()
+  if (!g) return DENIED
+  const key = String(fd.get('key') ?? '')
+  if (!/^[a-z_]{2,40}$/.test(key)) return { error: 'Neplatná požiadavka.' }
+  const supabase = g.supabase
+  const { error } = await supabase.rpc('set_module', { p_key: key, p_enabled: fd.get('enabled') === '1' })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/', 'layout')
+  return { ok: 'Nastavenie modulu bolo uložené.' }
+}
+
+export async function saveBranding(_: ActionState, fd: FormData): Promise<ActionState> {
+  const g = await founderGuard()
+  if (!g) return DENIED
+  const name = String(fd.get('name') ?? '').trim()
+  const short = String(fd.get('short') ?? '').trim()
+  const tagline = String(fd.get('tagline') ?? '').trim()
+  if (name.length < 2 || name.length > 80) return { error: 'Názov musí mať 2 až 80 znakov.' }
+  if (short.length < 1 || short.length > 4) return { error: 'Skratka musí mať 1 až 4 znaky.' }
+  if (tagline.length > 160) return { error: 'Slogan môže mať najviac 160 znakov.' }
+  const supabase = g.supabase
+  const { error } = await supabase.rpc('save_branding', { p_name: name, p_short: short, p_tagline: tagline })
+  if (error) return { error: dbMessage(error) }
+  revalidatePath('/', 'layout')
+  return { ok: 'Vizuálna identita bola uložená.' }
+}

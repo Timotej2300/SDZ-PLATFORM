@@ -33,3 +33,6 @@ Bezpečnosť, GDPR a pilot: `docs/PILOT_A_BEZPECNOST.md`.
 
 ## Fáza 8 (regionálna administrácia, SDZ Awards)
 Migrácia: `20261114000009_regional_awards.sql` (po 08). Regionálneho manažéra menuje centrála v `/admin/regions`; vidí iba svoj región (`/regional`). Ocenenia sa udeľujú ručne v `/admin/awards`; bodovanie, prahy a automatika zámerne nie sú definované. Test: `supabase/tests/04_regional.sql` (iba lokálne).
+
+## Moduly a vizuálna identita (Founder)
+Migrácia: `20261114000010_modules_branding.sql` (po 09). `/founder/modules` vypína nové záznamy v moduloch (podujatia, sťažnosti, ocenenia, oznamy, regionálny portál); história zostáva. `/founder/branding` mení názov, skratku a slogan. Zmeny idú cez Founder-only RPC a do auditu.

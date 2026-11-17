@@ -43,6 +43,7 @@ const MESSAGES: Record<string, string> = {
   RATE_LIMIT: 'Dosiahli ste denný limit podaní. Skúste to zajtra.',
   ALREADY_EXISTS: 'Takýto záznam alebo žiadosť už existuje.',
   INVALID_INPUT: 'Skontrolujte vyplnené údaje (povinné polia, minimálna dĺžka textu).',
+  MODULE_DISABLED: 'Táto časť systému je dočasne vypnutá. Existujúce údaje zostávajú zachované.',
   IN_USE: 'Položka sa už používa a nedá sa zmazať.',
   HAS_APPLICATIONS: 'Podujatie už má prihlášky, preto sa táto akcia nedá vykonať.',
 }
