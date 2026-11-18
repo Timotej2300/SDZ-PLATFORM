@@ -39,3 +39,6 @@ Migrácia: `20261114000010_modules_branding.sql` (po 09). `/founder/modules` vyp
 
 ## Písomná žiadosť organizácie, zoznam dobrovoľníkov, loading screen
 Migrácia: `20261114000011_org_application.sql` (po 10). Organizácia sa zakladá jedným písomným formulárom `/register/organization` (bez licencie a bez dokumentov; SDZ si môže vypýtať doplnenie). `/organization/volunteers` zobrazuje všetkých členov a hosťujúcich ako karty. Loading screen: `src/components/PageLoader.tsx` (konštanty `MIN_MS`/`MAX_MS`).
+
+## Verejný zoznam dobrovoľníkov organizácie
+Migrácia: `20261114000012_public_org_volunteers.sql` (po 11). Stránka `/organizacie/[slug]` ukazuje počet členov a karty dobrovoľníkov, ktorí si v profile zapli „Zobraziť domovskú organizáciu“.

@@ -100,5 +100,17 @@ insert into t_ok select 'zia: bez licencie a dokumentov', (select count(*) = 1 f
 insert into t_ok select 'zia: duplicitny slug', tt.expect_err('DUPLICATE', format($$select apply_organization('Iná','nonprofit','nova-oz',%L,'Ulica 1','a@b.sk',null,'Popis činnosti organizácie ktorá má aspoň dvadsať znakov',null)$$, :'reg'));
 insert into t_ok select 'zia: chybajuci popis', tt.expect_err('ORG_INCOMPLETE', format($$select apply_organization('Iná','nonprofit','ina-oz',%L,'Ulica 1','a@b.sk',null,'kratke',null)$$, :'reg'));
 
+-- verejný zoznam dobrovoľníkov organizácie
+select tt.as_user(null);
+select slug as osl from organizations where id = :'org' \gset
+select (public_org_volunteers(:'osl')->>'total')::int as tot \gset
+insert into t_ok select 'pub: pocet clenov', :tot >= 0;
+insert into t_ok select 'pub: bez roku narodenia', not (public_org_volunteers(:'osl')::text like '%birth%');
+update volunteers set public_show_organization = false;
+insert into t_ok select 'pub: bez suhlasu sa nezobrazi', jsonb_array_length(public_org_volunteers(:'osl')->'items') = 0;
+update volunteers set public_show_organization = true;
+insert into t_ok select 'pub: so suhlasom sa zobrazi', jsonb_array_length(public_org_volunteers(:'osl')->'items') = (select count(*) from organization_memberships m join volunteers v on v.id = m.volunteer_id where m.organization_id = :'org' and m.status = 'active' and v.status = 'active');
+insert into t_ok select 'pub: neplatny slug', public_org_volunteers('x y') is null;
+
 select name, ok from t_ok where not ok;
 select count(*) filter (where ok) as passed, count(*) filter (where not ok) as failed from t_ok;
