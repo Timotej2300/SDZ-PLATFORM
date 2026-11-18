@@ -51,7 +51,7 @@ export default async function Page() {
               <input id="token" name="token" className="input" required />
             </ActionForm>
             <p className="mt-4 text-sm">
-              Zastupujete organizáciu? <Link href="/register/organization" className="text-navy-700 underline">Zaregistrujte ju</Link>.
+              Zastupujete organizáciu? <Link href="/register/organization" className="text-navy-700 underline">Podajte písomnú žiadosť SDZ</Link>.
             </p>
           </div>
         )}

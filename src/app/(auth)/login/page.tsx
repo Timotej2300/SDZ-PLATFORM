@@ -23,8 +23,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
       </ActionForm>
       <p className="mt-4 text-sm"><Link href="/forgot-password" className="text-navy-700 underline">Zabudli ste heslo?</Link></p>
       <p className="mt-2 text-sm text-ink-600">
-        Registrácia dobrovoľníka prebieha cez pozvánku organizácie. Organizáciu môžete{' '}
-        <Link href="/register/organization" className="text-navy-700 underline">zaregistrovať tu</Link>.
+        Registrácia dobrovoľníka prebieha cez pozvánku organizácie. Organizácia môže{' '}
+        <Link href="/register/organization" className="text-navy-700 underline">podať písomnú žiadosť SDZ</Link>.
       </p>
     </div>
   )

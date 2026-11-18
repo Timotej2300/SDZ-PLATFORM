@@ -86,5 +86,19 @@ select tt.as_user(null);
 insert into t_ok select 'brand: verejne citatelne', (public_branding()->>'short') = 'TZ';
 insert into t_ok select 'brand: neplatna skratka', tt.expect_err('INVALID_INPUT', $$select save_branding('Test zväz','TOOLONG','x')$$) or true;
 
+-- písomná žiadosť organizácie
+select birth_year as by1 from profiles where id = :'b1' \gset
+update profiles set birth_year = extract(year from current_date)::int - 19 where id = :'b1';
+select tt.as_user(:'b1');
+insert into t_ok select 'zia: mlady koordinator zamietnuty', tt.expect_err('COORDINATOR_AGE', format($$select apply_organization('Nova OZ','nonprofit','nova-oz',%L,'Ulica 1','a@b.sk',null,'Popis činnosti organizácie ktorá má aspoň dvadsať znakov',null)$$, :'reg'));
+update profiles set birth_year = :by1 where id = :'b1';
+select tt.as_user(:'c2');
+select apply_organization('Nová OZ','nonprofit','nova-oz', :'reg', 'Ulica 1, Bratislava','nova@oz.sk',null,'Popis činnosti organizácie, ktorá má aspoň dvadsať znakov','Prosíme o zaradenie') as nid \gset
+insert into t_ok select 'zia: organizacia je submitted', (select status = 'submitted' from organizations where id = :'nid');
+insert into t_ok select 'zia: koordinator je owner', has_permission(:'c2', 'org.manage', 'organization', :'nid');
+insert into t_ok select 'zia: bez licencie a dokumentov', (select count(*) = 1 from organization_applications where organization_id = :'nid' and applicant_message = 'Prosíme o zaradenie');
+insert into t_ok select 'zia: duplicitny slug', tt.expect_err('DUPLICATE', format($$select apply_organization('Iná','nonprofit','nova-oz',%L,'Ulica 1','a@b.sk',null,'Popis činnosti organizácie ktorá má aspoň dvadsať znakov',null)$$, :'reg'));
+insert into t_ok select 'zia: chybajuci popis', tt.expect_err('ORG_INCOMPLETE', format($$select apply_organization('Iná','nonprofit','ina-oz',%L,'Ulica 1','a@b.sk',null,'kratke',null)$$, :'reg'));
+
 select name, ok from t_ok where not ok;
 select count(*) filter (where ok) as passed, count(*) filter (where not ok) as failed from t_ok;

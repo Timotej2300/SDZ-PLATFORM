@@ -11,7 +11,7 @@ export default async function OrgLayout({ children }: { children: React.ReactNod
   if (!org) {
     return (
       <AppShell title="Organizačný portál" user={user} nav={[{ href: '/account', label: 'Môj účet' }]}>
-        <Empty title="Nepôsobíte v žiadnej organizácii" hint="Ak zastupujete organizáciu, vytvorte žiadosť o jej registráciu." href="/register/organization" cta="Registrovať organizáciu" />
+        <Empty title="Nepôsobíte v žiadnej organizácii" hint="Ak zastupujete organizáciu, podajte písomnú žiadosť SDZ o jej zaradenie." href="/register/organization" cta="Podať žiadosť" />
       </AppShell>
     )
   }

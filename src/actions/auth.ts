@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { dbMessage, type ActionState } from '@/lib/errors'
-import { loginSchema, signUpSchema, emailSchema, passwordSchema, firstError, slugify, orgCreateSchema } from '@/lib/validation'
+import { loginSchema, signUpSchema, emailSchema, passwordSchema, firstError, slugify, orgCreateSchema, uuidSchema } from '@/lib/validation'
 import { rateLimit, sha256, siteUrl } from '@/lib/server-utils'
 
 const GENERIC_LOGIN_ERROR = 'Nesprávny e-mail alebo heslo.'
@@ -123,6 +123,32 @@ export async function createOrganizationDraft(_: ActionState, fd: FormData): Pro
       p_slug: slug,
     })
     if (!error) redirect('/organization/profile')
+    if (!String(error.message).includes('DUPLICATE')) return { error: dbMessage(error) }
+  }
+  return { error: 'Nepodarilo sa vytvoriť jedinečnú adresu organizácie. Skúste upraviť názov.' }
+}
+
+export async function applyOrganization(_: ActionState, fd: FormData): Promise<ActionState> {
+  const str = (k: string) => String(fd.get(k) ?? '').trim()
+  const parsed = orgCreateSchema.safeParse({ name: fd.get('name'), type: fd.get('type') })
+  if (!parsed.success) return { error: firstError(parsed.error) }
+  const region = uuidSchema.safeParse(fd.get('region'))
+  if (!region.success) return { error: 'Vyberte kraj, v ktorom organizácia pôsobí.' }
+  const email = str('email')
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: 'Zadajte platný kontaktný e-mail.' }
+  if (str('address').length < 3) return { error: 'Zadajte adresu alebo sídlo organizácie.' }
+  if (str('description').length < 20) return { error: 'Popíšte činnosť organizácie aspoň na 20 znakov.' }
+  if (str('message').length > 4000 || str('description').length > 4000) return { error: 'Text je príliš dlhý (najviac 4000 znakov).' }
+  const supabase = await createClient()
+  const base = slugify(parsed.data.name)
+  for (let i = 0; i < 5; i++) {
+    const slug = i === 0 ? base : `${base}-${Math.floor(1000 + Math.random() * 9000)}`
+    const { error } = await supabase.rpc('apply_organization', {
+      p_name: parsed.data.name, p_type: parsed.data.type, p_slug: slug, p_region: region.data,
+      p_address: str('address'), p_email: email, p_phone: str('phone') || null,
+      p_description: str('description'), p_message: str('message') || null,
+    })
+    if (!error) redirect('/organization')
     if (!String(error.message).includes('DUPLICATE')) return { error: dbMessage(error) }
   }
   return { error: 'Nepodarilo sa vytvoriť jedinečnú adresu organizácie. Skúste upraviť názov.' }

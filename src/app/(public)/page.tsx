@@ -27,7 +27,7 @@ export default async function HomePage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/organizacie" className="btn-success">Pozrieť organizácie</Link>
             <Link href="/register/organization" className="btn bg-white text-navy-900 hover:bg-gray-100">
-              Registrovať organizáciu
+              Podať žiadosť organizácie
             </Link>
           </div>
         </div>

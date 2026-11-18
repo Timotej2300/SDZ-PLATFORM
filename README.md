@@ -36,3 +36,6 @@ Migrácia: `20261114000009_regional_awards.sql` (po 08). Regionálneho manažér
 
 ## Moduly a vizuálna identita (Founder)
 Migrácia: `20261114000010_modules_branding.sql` (po 09). `/founder/modules` vypína nové záznamy v moduloch (podujatia, sťažnosti, ocenenia, oznamy, regionálny portál); história zostáva. `/founder/branding` mení názov, skratku a slogan. Zmeny idú cez Founder-only RPC a do auditu.
+
+## Písomná žiadosť organizácie, zoznam dobrovoľníkov, loading screen
+Migrácia: `20261114000011_org_application.sql` (po 10). Organizácia sa zakladá jedným písomným formulárom `/register/organization` (bez licencie a bez dokumentov; SDZ si môže vypýtať doplnenie). `/organization/volunteers` zobrazuje všetkých členov a hosťujúcich ako karty. Loading screen: `src/components/PageLoader.tsx` (konštanty `MIN_MS`/`MAX_MS`).
